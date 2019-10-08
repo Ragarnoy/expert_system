@@ -6,7 +6,7 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/02 19:29:01 by tlernoul          #+#    #+#             */
-/*   Updated: 2019/10/08 21:43:28 by tlernoul         ###   ########.fr       */
+/*   Updated: 2019/10/08 22:24:17 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,25 @@ struct Fact
     value: bool,
 }
 
+fn tokenize(line: String) -> Result<Vec<char>, Error>
+{
+    let flag: i8 = 0;
+    let ret: Vec<char> = Vec::new();
+
+    for c in line.split_whitespace()
+    {
+        if flag == 0 && c.
+        {
+        }
+    }
+    return Ok(Vec::new())
+}
 
 fn parse_and_return(input: String) -> Result<String, Error>
 {
     for c in input.lines()
     {
-        if c.chars().next().unwrap().is_alphanumeric()
+        if !(c.find("#") == Some(0))
         {
             println!("{}", c);
         }
