@@ -6,72 +6,96 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/02 19:29:01 by tlernoul          #+#    #+#             */
-/*   Updated: 2019/10/08 22:24:17 by tlernoul         ###   ########.fr       */
+/*   Updated: 2019/10/11 21:14:04 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #[macro_use]
 extern crate clap;
-extern crate nom;
 use clap::{Arg, App};
 use std::path::Path;
 use std::string;
 use std::fs;
 use std::io::{Error};
 
+
+// TODO Error enum for Expert system
+
 struct Rule 
 {
-    Left: Vec<Operator>,
-    Right: Vec<Operator>,
-    Middle: Vec<Operator>,
+    left: Vec<Operation>,
+    right: Vec<Operation>,
+    middle: Operation,
 }
 
-enum Facts
+struct Operation
 {
-    Res,
-    Fact,
+    outcome: Result<Outcome, Error>,
+    operator: Operators,
+    facts: (String, String),
+    reverse: (bool, bool),
 }
 
-enum Operator
+enum Operators
 {
-    AND (Fact, Fact),
-    OR (Fact, Fact),
-    XOR (Fact, Fact),
-    THEN,
+    And,
+    Or,
+    Xor,
+    Then,
+    IfOnly,
 }
 
-struct Fact
+enum Outcome
 {
-    name: String,
-    value: bool,
+    True,
+    False,
+    Unkn,
 }
 
-fn tokenize(line: String) -> Result<Vec<char>, Error>
-{
-    let flag: i8 = 0;
-    let ret: Vec<char> = Vec::new();
 
-    for c in line.split_whitespace()
+fn tokenize(facts: Vec<&str>)
+{
+    let mut oper: Vec<Operation> = Vec::new();
+
+    for f in facts.iter()
     {
-        if flag == 0 && c.
-        {
-        }
+        
     }
-    return Ok(Vec::new())
 }
+
 
 fn parse_and_return(input: String) -> Result<String, Error>
 {
-    for c in input.lines()
+    let mut rule: Vec<&str> = Vec::new();
+
+    'outer: for line in input.lines()
     {
-        if !(c.find("#") == Some(0))
+        if !(line.find('#') == Some(0)) && line.find(char::is_alphabetic) == Some(0)
         {
-            println!("{}", c);
+            'inner: for c in line.split_whitespace()
+            {
+                if c.chars().all(char::is_alphabetic) ||
+                c.chars().nth(0) == Some('!') && c.chars().nth(1).unwrap().is_alphabetic()
+                {
+                    rule.push(c);
+                }
+                if c == "+" || c == "|" || c == "^" || c == "=>" || c == "<=>"
+                {
+                    rule.push(c);
+                }
+                if c == "#" { break 'inner; }
+            }
+            rule.push("\n")
         }
     }
+    for a in rule.iter()
+    {
+        print!("{} ", a);
+    }
+    println!("");
+    tokenize(rule);
     return Ok("truc".into())
 }
-
 
 fn main() 
 {
