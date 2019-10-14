@@ -1,4 +1,6 @@
-enum Operators
+use crate::*;
+
+pub enum Operators
 {
     And,
     Or,
@@ -7,7 +9,7 @@ enum Operators
     IfOnly,
 }
 
-enum Outcome
+pub enum Outcome
 {
     True,
     False,

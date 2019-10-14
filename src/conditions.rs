@@ -1,7 +1,14 @@
-struct Operation
+use crate::*;
+
+pub struct Operation
 {
     outcome: Result<Outcome, Error>,
     operator: Operators,
-    facts: (String, String),
-    reverse: (bool, bool),
+    facts: (Fact, Fact),
+}
+
+pub struct Fact
+{
+    name: char,
+    not: bool,
 }

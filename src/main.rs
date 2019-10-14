@@ -6,52 +6,26 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/02 19:29:01 by tlernoul          #+#    #+#             */
-/*   Updated: 2019/10/11 21:14:04 by tlernoul         ###   ########.fr       */
+/*   Updated: 2019/10/14 23:42:55 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #[macro_use]
 extern crate clap;
+mod conditions;
+mod operators; 
+mod rules;
 use clap::{Arg, App};
 use std::path::Path;
-use std::string;
+use std::string::String;
 use std::fs;
 use std::io::{Error};
+use conditions::*;
+use operators::*;
+use rules::*;
 
 
 // TODO Error enum for Expert system
-
-struct Rule 
-{
-    left: Vec<Operation>,
-    right: Vec<Operation>,
-    middle: Operation,
-}
-
-struct Operation
-{
-    outcome: Result<Outcome, Error>,
-    operator: Operators,
-    facts: (String, String),
-    reverse: (bool, bool),
-}
-
-enum Operators
-{
-    And,
-    Or,
-    Xor,
-    Then,
-    IfOnly,
-}
-
-enum Outcome
-{
-    True,
-    False,
-    Unkn,
-}
-
 
 fn tokenize(facts: Vec<&str>)
 {
@@ -72,30 +46,32 @@ fn parse_and_return(input: String) -> Result<String, Error>
     {
         if !(line.find('#') == Some(0)) && line.find(char::is_alphabetic) == Some(0)
         {
-            'inner: for c in line.split_whitespace()
+            'inner: for str in line.split_whitespace()
             {
-                if c.chars().all(char::is_alphabetic) ||
-                c.chars().nth(0) == Some('!') && c.chars().nth(1).unwrap().is_alphabetic()
+                if str.chars().all(char::is_alphabetic) ||
+                str.chars().nth(0) == Some('!') && str.chars().nth(1).unwrap().is_alphabetic() && str.len() == 2
                 {
-                    rule.push(c);
+                    rule.push(str);
                 }
-                if c == "+" || c == "|" || c == "^" || c == "=>" || c == "<=>"
+                if str == "+" || str == "|" || str == "^" || str == "=>" || str == "<=>"
                 {
-                    rule.push(c);
+                    rule.push(str);
                 }
-                if c == "#" { break 'inner; }
+                if str == "#" { break 'inner; }
             }
             rule.push("\n")
         }
     }
+    print!(" ");
     for a in rule.iter()
     {
         print!("{} ", a);
     }
     println!("");
-    tokenize(rule);
+    //tokenize(rule);
     return Ok("truc".into())
 }
+
 
 fn main() 
 {
@@ -109,13 +85,13 @@ fn main()
                     .get_matches();
 
     let file = Path::new(matches.value_of("input").unwrap());
-    let mut content: String = string::String::from("");
 
-    match file.exists()
+    let content = fs::read_to_string(file).unwrap();
+
+    match parse_and_return(content)
     {
-        true => content = string::String::from(fs::read_to_string(file).unwrap()),
-        false => panic!("Invalid input"),
-    }
-    parse_and_return(content);
+        Ok(ret) => 1,
+        Err(error) => 0,
+    };
     //println!("{}", content);
 }
