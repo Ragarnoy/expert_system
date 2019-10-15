@@ -1,8 +1,9 @@
 use crate::*;
 
+#[derive(Default, Debug)]
 pub struct Rule 
 {
-    left: Vec<Operation>,
-    right: Vec<Operation>,
+    left: Operation,
+    right: Operation,
     middle: Operation,
 }

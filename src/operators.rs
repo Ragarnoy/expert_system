@@ -1,5 +1,6 @@
 use crate::*;
 
+#[derive(Debug)]
 pub enum Operators
 {
     And,
@@ -7,11 +8,4 @@ pub enum Operators
     Xor,
     Then,
     IfOnly,
-}
-
-pub enum Outcome
-{
-    True,
-    False,
-    Unkn,
 }

@@ -6,7 +6,7 @@
 /*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/02 19:29:01 by tlernoul          #+#    #+#             */
-/*   Updated: 2019/10/14 23:42:55 by tlernoul         ###   ########.fr       */
+/*   Updated: 2019/10/15 18:39:39 by tlernoul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ fn parse_and_return(input: String) -> Result<String, Error>
         {
             'inner: for str in line.split_whitespace()
             {
-                if str.chars().all(char::is_alphabetic) ||
+                if str.chars().all(char::is_alphabetic) && str.len() == 1 ||
                 str.chars().nth(0) == Some('!') && str.chars().nth(1).unwrap().is_alphabetic() && str.len() == 2
                 {
                     rule.push(str);
