@@ -1,6 +1,7 @@
 use crate::{token::Factoken, operators::Operators, rules::Rule, fact::Fact};
 use std::{
 	collections::HashMap,
+	iter::FromIterator,
 	fmt,
 	hash::{Hash, Hasher}
 };
@@ -85,7 +86,7 @@ impl Operation
 			},
 			(Some(token), None) if self.operator == None => token.resolve(rules, known, seen),
 			(None, Some(token)) if self.operator == None => token.resolve(rules, known, seen),
-			_ => 
+			_ =>
 			{
 				eprintln!("expert-system: unable to resolve the following operation due to an internal error: {}", self);
 				std::process::exit(1);
@@ -95,14 +96,49 @@ impl Operation
 
 	pub fn resolve_as_conclusion_true(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> HashMap<Fact, Option<bool>>// Option<bool>
 	{
-		// TODO: Implement me
-		HashMap::new()
+		// TODO: Handle OR and XOR conclusions
+		match self.operator
+		{
+			Some(op) => match op
+			{
+				Operators::And => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(true)))),
+				_ =>
+				{
+					eprintln!("expert-system: OR and XOR in conclusion are not supported: {}", self);
+					std::process::exit(1);
+				}
+			},
+			_ => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(true))))
+		}
 	}
 
 	pub fn resolve_as_conclusion_false(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> HashMap<Fact, Option<bool>>// Option<bool>
 	{
-		// TODO: Implement me
-		HashMap::new()
+		// TODO: Handle OR and XOR conclusions
+		// Maybe a good idea to have a Vec<Fact> in the Operation struct
+		// to be able to quickly get all the facts an operation contains.
+		// Also, a FALSE conclusion even with only AND operators in it
+		// seems to be a bit more tricky than expected:
+		// from my understanding A + B => C + D means "if the expression `A AND B` is FALSE then the experession `C AND D` is FALSE"
+		// so C can be TRUE or FALSE as long as D is FALSE and the opposite is true as well.
+		// I really hope I'm wrong ! (Otherwise this method is wrong)
+		// Actually I'm maybe wrong (that would be great !) and I just need a break because this would lead to an undefined result for one of the fact
+		// but the subject of the project explicitly says that we can't have undefined value if we don't support OR and XOR conclusions.
+		// If a fact is FALSE and a rule which implies this fact returns FALSE is the fact set to FALSE or its is just not changed.
+		// (Read again if you don't see the difference)
+		match self.operator
+		{
+			Some(op) => match op
+			{
+				Operators::And => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(false)))),
+				_ => 
+				{
+					eprintln!("expert-system: OR and XOR in conclusion are not supported: {}", self);
+					std::process::exit(1);
+				}
+			},
+			_ => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(false))))
+		}
 	}
 
 	pub fn get_facts(&self) -> Vec<Fact>
