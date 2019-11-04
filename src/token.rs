@@ -1,7 +1,7 @@
 use crate::{fact::Fact, operation::Operation, rules::Rule};
 use std::{fmt, collections::HashMap};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, Hash)]
 pub enum Factoken
 {
     Fact(Fact),
@@ -55,12 +55,34 @@ impl Factoken
 		}
 	}
 
+	pub fn resolve_as_conclusion(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>// Option<bool>
+	{
+		match self
+		{
+			Self::Fact(f) => {
+				let mut ret = HashMap::new();
+				ret.insert(*f, Some(result));
+				ret
+			},
+			Self::Operation(o) => o.resolve_as_conclusion(rules, known, seen, result)
+		}
+	}
+
 	pub fn contains_fact(&self, fact: &Fact) -> bool
 	{
 		match self
 		{
 			Factoken::Fact(f) => f == fact,
 			Factoken::Operation(o) => o.contains_fact(fact)
+		}
+	}
+
+	pub fn get_facts(&self) -> Vec<Fact>
+	{
+		match self
+		{
+			Self::Fact(f) => vec!(*f),
+			Self::Operation(o) => o.get_facts()
 		}
 	}
 }

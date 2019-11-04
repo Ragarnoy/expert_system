@@ -27,8 +27,8 @@ impl Rule
 	{
 		match self.left.resolve(rules, known, seen)
 		{
-			Some(true) => self.right.resolve_as_conclusion_true(rules, known, seen),
-			Some(false) => self.right.resolve_as_conclusion_false(rules, known, seen),
+			Some(true) => self.right.resolve_as_conclusion(rules, known, seen, true),
+			Some(false) => self.right.resolve_as_conclusion(rules, known, seen, false),
 			None => HashMap::from_iter(self.right.get_facts().iter().map(|&f| (f, None)))
 		}
 	}

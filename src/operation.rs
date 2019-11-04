@@ -78,41 +78,10 @@ impl Operation
 	// where
 	// 	T: Iterator<Item=Rule> + DoubleEndedIterator<Item=Rule>
 	{
-		match &self.facts
-		{
-			(Some(token0), Some(token1)) if self.operator.is_some() =>
-			{
-				self.operator.unwrap().resolve(token0.resolve(rules, known, seen), token1.resolve(rules, known, seen))
-			},
-			(Some(token), None) if self.operator == None => token.resolve(rules, known, seen),
-			(None, Some(token)) if self.operator == None => token.resolve(rules, known, seen),
-			_ =>
-			{
-				eprintln!("expert-system: unable to resolve the following operation due to an internal error: {}", self);
-				std::process::exit(1);
-			}
-		}
+		self.operator.resolve(self.facts.0.resolve(rules, known, seen), self.facts.1.resolve(rules, known, seen))
 	}
 
-	pub fn resolve_as_conclusion_true(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> HashMap<Fact, Option<bool>>// Option<bool>
-	{
-		// TODO: Handle OR and XOR conclusions
-		match self.operator
-		{
-			Some(op) => match op
-			{
-				Operators::And => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(true)))),
-				_ =>
-				{
-					eprintln!("expert-system: OR and XOR in conclusion are not supported: {}", self);
-					std::process::exit(1);
-				}
-			},
-			_ => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(true))))
-		}
-	}
-
-	pub fn resolve_as_conclusion_false(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> HashMap<Fact, Option<bool>>// Option<bool>
+	pub fn resolve_as_conclusion(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>// Option<bool>
 	{
 		// TODO: Handle OR and XOR conclusions
 		// Maybe a good idea to have a Vec<Fact> in the Operation struct
@@ -128,32 +97,25 @@ impl Operation
 		// (Read again if you don't see the difference)
 		match self.operator
 		{
-			Some(op) => match op
+			Operators::And => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(result)))),
+			_ =>
 			{
-				Operators::And => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(false)))),
-				_ => 
-				{
-					eprintln!("expert-system: OR and XOR in conclusion are not supported: {}", self);
-					std::process::exit(1);
-				}
-			},
-			_ => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(false))))
+				eprintln!("expert-system: OR and XOR in conclusion are not supported: {}", self);
+				std::process::exit(1);
+			}
 		}
 	}
 
 	pub fn get_facts(&self) -> Vec<Fact>
 	{
-		// TODO: Implement me
-		Vec::new()
+		let mut facts = self.facts.0.get_facts();
+		facts.append(&mut self.facts.1.get_facts());
+		facts
 	}
 
 	pub fn contains_fact(&self, fact: &Fact) -> bool
 	{
-		match (self.facts.0.as_ref(), self.facts.1.as_ref())
-		{
-			(Some(f0), Some(f1)) => f0.contains_fact(fact) || f1.contains_fact(fact),
-			(_, _) => false
-		}
+		self.facts.0.contains_fact(fact) || self.facts.1.contains_fact(fact)
 	}
 }
 
