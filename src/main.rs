@@ -12,17 +12,16 @@
 
 #[macro_use]
 extern crate clap;
-mod conditions;
+
+mod fact;
 mod operators; 
+mod operation;
+mod token;
 mod rules;
+
 use clap::{Arg, App};
-use std::path::Path;
-use std::string::String;
-use std::fs;
-use std::io::{Error};
-use conditions::*;
-use operators::*;
-use rules::*;
+use std::{path::Path, fs, io::Error};
+use operation::Operation;
 
 
 // TODO Error enum for Expert system

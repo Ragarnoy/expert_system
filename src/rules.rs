@@ -1,9 +1,22 @@
-use crate::*;
+use crate::{operation::Operation, operators::Operators};
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct Rule 
 {
     left: Operation,
     right: Operation,
-    middle: Operation,
+    middle: Operators,
+}
+
+impl Default for Rule
+{
+    fn default() -> Self
+    {
+        Rule
+        {
+            left: Operation::default(),
+            right: Operation::default(),
+            middle: Operators::Then,
+        }
+    }
 }
