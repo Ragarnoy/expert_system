@@ -7,3 +7,11 @@ pub enum Operators
     Then,
     IfOnly,
 }
+
+impl Default for Operators
+{
+	fn default() -> Self
+	{
+		Self::Then
+	}
+}
