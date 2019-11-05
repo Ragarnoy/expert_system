@@ -8,8 +8,8 @@ use std::{
 #[derive(Default, Debug, Eq, Copy, Clone)]
 pub struct Fact
 {
-	name: char,
-	not: bool,
+	pub name: char,
+	pub not: bool,
 }
 
 impl PartialEq for Fact
@@ -88,9 +88,7 @@ impl Fact
 		self.not
 	}
 
-	pub fn resolve/*<T>*/(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> Option<bool>
-	// where
-	// 	T: Iterator<Item=Rule> + DoubleEndedIterator<Item=Rule>
+	pub fn resolve(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> Option<bool>
 	{
 		// We probably should have a list of the Fact which are already known as TRUE
 		// and verify in this list if we have a value for the Fact we're trying to resolve
@@ -152,7 +150,8 @@ impl Fact
 #[cfg(test)]
 mod test_fact
 {
-	use crate::fact::Fact;
+	use crate::{fact::Fact, token::Factoken, operation::Operation, operators::Operators, rules::Rule};
+	use std::collections::HashMap;
 
 	#[test]
 	fn test_new()
@@ -201,6 +200,128 @@ mod test_fact
 	#[test]
 	fn test_resolve()
 	{
+		let rules = vec!(
+		// A | B + C => E
+		Rule
+		{
+			left: Factoken::Operation(
+				Operation
+				{
+					operator: Operators::Or,
+					facts: (Box::new(Factoken::Fact(Fact {name: 'A', not: false})), Box::new(Factoken::Operation(
+						Operation
+						{
+							operator: Operators::And,
+							facts: (Box::new(Factoken::Fact(Fact {name: 'B', not: false})), Box::new(Factoken::Fact(Fact {name: 'C', not: false}))),
+							raw: "B + C".into()
+						}
+					))),
+					raw: "A | B + C".into()
+				}
+			),
+			right: Factoken::Fact(Fact {name: 'E', not: false}),
+			middle: Operators::Then
+		},
+
+		// (F | G) + H => E
+		Rule
+		{
+			left: Factoken::Operation(
+				Operation
+				{
+					operator: Operators::And,
+					facts: (Box::new(Factoken::Operation(
+						Operation
+						{
+							operator: Operators::Or,
+							facts: (Box::new(Factoken::Fact(Fact {name: 'F', not: false})), Box::new(Factoken::Fact(Fact {name: 'G', not: false}))),
+							raw: "(F | G)".into()
+						}
+					)), Box::new(Factoken::Fact(Fact {name: 'H', not: false}))),
+					raw: "(F | G) + H".into()
+				}
+			),
+			right: Factoken::Fact(Fact {name: 'E', not: false}),
+			middle: Operators::Then
+		});
+
+		// ?E
+		let query = Fact {name: 'E', not: false};
+
+		// =A -> E should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'A', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+
+		// =B -> E should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'B', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+
+		// =C -> E should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'C', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+
+		// =AC -> E should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'A', not: false}, Some(true));
+		known.insert(Fact{name: 'C', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+
+		// =BC -> E should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'B', not: false}, Some(true));
+		known.insert(Fact{name: 'C', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+
+
+		// =F -> E should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'F', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+
+		// =G -> E should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'G', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+
+		// =H -> E should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'H', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+
+		// =FH -> E should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'F', not: false}, Some(true));
+		known.insert(Fact{name: 'H', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+
+		// =GH -> E should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'G', not: false}, Some(true));
+		known.insert(Fact{name: 'H', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
 
 	}
 }

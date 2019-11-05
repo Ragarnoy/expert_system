@@ -9,9 +9,9 @@ use std::{
 #[derive(Debug, Default, Clone)]
 pub struct Operation
 {
-    operator: Operators,
-    facts: (Box<Factoken>, Box<Factoken>),
-	raw: String
+    pub operator: Operators,
+    pub facts: (Box<Factoken>, Box<Factoken>),
+	pub raw: String
 }
 
 impl PartialEq for Operation
@@ -117,9 +117,4 @@ impl Operation
 	{
 		self.facts.0.contains_fact(fact) || self.facts.1.contains_fact(fact)
 	}
-}
-
-fn capture_parentheses(input: &str)
-{
-
 }
