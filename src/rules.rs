@@ -30,4 +30,36 @@ impl Rule
 	{
 		self.right.contains_fact(fact)
 	}
+
+	pub fn new(input: &str) -> Result<Self, String>
+	{
+		if input.matches("=>").count() == 1
+		{
+			let parts = input.split("=>");
+			let left = parts.next().unwrap_or("");
+			let right  = parts.next().unwrap_or("");
+			Ok(Rule
+			{
+				left: Factoken::new(left),
+				right: Factoken::new(right),
+				middle: Operators::Then
+			})
+		}
+		else if input.matches("<=>").count() == 1
+		{
+			let parts = input.split("<=>");
+			let left = parts.next().unwrap_or("");
+			let right  = parts.next().unwrap_or("");
+			Ok(Rule
+			{
+				left: Factoken::new(left),
+				right: Factoken::new(right),
+				middle: Operators::Then
+			})
+		}
+		else
+		{
+			Err(format!("a rule MUST contains exactly one `=>` OR `<=>` operator: {}", input))
+		}
+	}
 }
