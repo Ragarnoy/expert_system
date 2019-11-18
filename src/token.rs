@@ -43,9 +43,7 @@ impl fmt::Display for Factoken
 
 impl Factoken
 {
-	pub fn resolve/*<T>*/(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> Option<bool>
-	// where
-	// 	T: Iterator<Item=Rule> + DoubleEndedIterator<Item=Rule>
+	pub fn resolve(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> Option<bool>
 	{
 		match self
 		{
@@ -55,7 +53,7 @@ impl Factoken
 		}
 	}
 
-	pub fn resolve_as_conclusion(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>// Option<bool>
+	pub fn resolve_as_conclusion(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>
 	{
 		match self
 		{

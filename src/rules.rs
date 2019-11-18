@@ -9,21 +9,9 @@ pub struct Rule
     pub middle: Operators,
 }
 
-// impl PartialEq for Rule
-// {
-// 	fn eq(&self, other: &Self) -> bool
-// 	{
-// 		self.left == other.left
-// 			&& self.right == other.right
-// 			&& self.middle == other.middle
-// 	}
-// }
-
 impl Rule
 {
-	pub fn resolve/*<T>*/(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> HashMap<Fact, Option<bool>>// Option<bool>
-	// where
-	// 	T: Iterator<Item=Rule> + DoubleEndedIterator<Item=Rule>
+	pub fn resolve(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> HashMap<Fact, Option<bool>>
 	{
 		match self.left.resolve(rules, known, seen)
 		{
@@ -35,23 +23,8 @@ impl Rule
 
 	pub fn has_been_seen_for_fact(&self, seen: &mut HashMap<Rule, Vec<Fact>>, fact: &Fact) -> bool
 	{
-		/*if */seen.get(self).is_some() && seen[self].iter().any(|f| f == fact)
-		// {
-		// 	return true;
-		// }
-		// seen.entry(self.clone()).or_insert(Vec::new()).push(*fact);
-		// false
+		seen.get(self).is_some() && seen[self].iter().any(|f| f == fact)
 	}
-
-	// pub fn resolve_if_not_seen_for_fact(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, bool>, &mut seen: &mut HashMap<Rule, Vec<Fact>>, fact: &Fact) -> Option<bool>
-	// {
-	// 	if seen.get(self).is_some() && seen[self].iter().any(|f| f == fact)
-	// 	{
-	// 		return true;
-	// 	}
-	// 	seen.entry(self.clone()).or_insert(Vec::new()).push(*fact);
-	// 	false
-	// }
 
 	pub fn contains_fact_as_conclusion(&self, fact: &Fact) -> bool
 	{

@@ -84,16 +84,6 @@ impl Fact
 		}
 	}
 
-	// pub fn resolve(&self, intials: &I, rules: &T) -> Option<bool>
-	// where
-	// 	I: Iterator<Item=Fact>,
-	// 	T: Iterator<Item=Rule> + DoubleEndedIterator<Item=Rule>
-	// {
-	// 	// We probably should have a list of the Fact which are already known as TRUE
-	// 	// and verify in this list if we have a value for the Fact we're trying to resolve
-
-	// }
-
 	pub fn is_not(&self) -> bool
 	{
 		self.not
@@ -110,10 +100,6 @@ impl Fact
 		// and none of the previous ones make it TRUE then the Fact is false
 		let mut result: Option<bool> = Some(false);
 		let mut is_result_assigned = false;
-		// if intials.any(|ref f| f == self)
-		// {
-		// 	return Some(true);
-		// }
 		if let Some(&value) = known.get(self)
 		{
 			return value;
@@ -146,17 +132,6 @@ impl Fact
 			{
 				break;
 			}
-			// let value = rule.resolve(rules, known, seen);
-			// if let Some(true) = value
-			// {
-			// 	result = value;
-			// 	*known.entry(*self).or_insert(true) = true;
-			// 	break;
-			// }
-			// else if result.is_none()
-			// {
-			// 	result = value;
-			// }
 		}
 		result
 	}

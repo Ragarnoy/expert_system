@@ -19,9 +19,6 @@ impl PartialEq for Operation
 	fn eq(&self, other: &Self) -> bool
 	{
 		self.raw == other.raw
-		// self.operator == other.operator
-		// 	&& self.facts.0 == other.facts.0
-		// 	&& self.facts.1 == other.facts.1
 	}
 }
 
@@ -32,8 +29,6 @@ impl Hash for Operation
 	fn hash<H: Hasher>(&self, state: &mut H)
 	{
 		self.raw.hash(state);
-		// self.operator.hash(state);
-		// self.facts.hash(state);
 	}
 }
 
@@ -74,14 +69,12 @@ impl Operation
 	// 	}
 	// }
 
-	pub fn resolve/*<T>*/(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> Option<bool>
-	// where
-	// 	T: Iterator<Item=Rule> + DoubleEndedIterator<Item=Rule>
+	pub fn resolve(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> Option<bool>
 	{
 		self.operator.resolve(self.facts.0.resolve(rules, known, seen), self.facts.1.resolve(rules, known, seen))
 	}
 
-	pub fn resolve_as_conclusion(&self, /*intials: &I, */rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>// Option<bool>
+	pub fn resolve_as_conclusion(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>
 	{
 		// TODO: Handle OR and XOR conclusions
 		// Maybe a good idea to have a Vec<Fact> in the Operation struct
