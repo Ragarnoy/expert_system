@@ -7,3 +7,12 @@ pub struct Operation
     facts: (Box<Factoken>, Box<Factoken>),
 	raw: String
 }
+
+impl Operation
+{
+	pub fn new(input: &str) -> Result<Self, String>
+	{
+		// TODO: Implement me
+		Ok(Self::default())
+	}
+}
