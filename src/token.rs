@@ -14,3 +14,12 @@ impl Default for Factoken
 		Self::Fact(Fact::default())
 	}
 }
+
+impl Factoken
+{
+	pub fn new(input: &str) -> Result<Self, String>
+	{
+		// TODO: Implement me
+		Ok(Self::default())
+	}
+}
