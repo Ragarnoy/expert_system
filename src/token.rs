@@ -16,6 +16,14 @@ impl Default for Factoken
 	}
 }
 
+impl Factoken
+{
+	pub fn new(input: &str) -> Result<Self, String>
+	{
+		// TODO: Implement me
+		Ok(Self::default())
+	}
+}
 impl PartialEq for Factoken
 {
 	fn eq(&self, other: &Self) -> bool
