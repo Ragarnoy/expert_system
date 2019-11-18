@@ -114,10 +114,14 @@ impl Fact
 				continue;
 			}
 			seen.entry(rule.clone()).or_insert(Vec::new()).push(*self);
-			for (fact, value) in rule.resolve(rules, known, seen)
+			for (fact, mut value) in rule.resolve(rules, known, seen)
 			{
 				if fact == *self && (!is_result_assigned || result.is_none() || (result == Some(false) && value.is_some()))
 				{
+					if self.is_not() && value.is_some()
+					{
+						value = Some(!value.unwrap());
+					}
 					result = value;
 					is_result_assigned = true;
 				}

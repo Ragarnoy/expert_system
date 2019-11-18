@@ -61,7 +61,7 @@ impl Factoken
 		{
 			Self::Fact(f) => {
 				let mut ret = HashMap::new();
-				ret.insert(*f, Some(result));
+				ret.insert(*f, Some(if f.is_not() { !result } else { result }));
 				ret
 			},
 			Self::Operation(o) => o.resolve_as_conclusion(rules, known, seen, result)

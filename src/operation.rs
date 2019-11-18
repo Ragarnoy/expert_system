@@ -97,7 +97,9 @@ impl Operation
 		// (Read again if you don't see the difference)
 		match self.operator
 		{
-			Operators::And => HashMap::from_iter(self.get_facts().iter().map(|&f| (f, Some(result)))),
+			Operators::And => HashMap::from_iter(self.get_facts().iter().map(|&f| {
+				(f, Some(if f.is_not() { !result } else { result }))
+			})),
 			_ =>
 			{
 				eprintln!("expert-system: OR and XOR in conclusion are not supported: {}", self);
