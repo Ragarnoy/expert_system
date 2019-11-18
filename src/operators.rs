@@ -15,3 +15,12 @@ impl Default for Operators
 		Self::Then
 	}
 }
+
+impl Operators
+{
+	pub fn is_present(input: &str) -> bool
+	{
+		static operators: &[char] = &['+', '|', '^'];
+		input.contains(operators)
+	}
+}
