@@ -12,6 +12,8 @@ impl Rule
 {
 	pub fn new(input: &str) -> Result<Self, String>
 	{
+		// TODO: We should search here for duplicated fact
+		// in both operation and conclusion side.
 		if input.matches("=>").count() == 1
 		{
 			let mut parts = input.split("=>");
