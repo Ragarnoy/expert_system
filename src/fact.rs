@@ -326,6 +326,225 @@ mod test_fact
 		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
 		assert!(result.is_some());
 		assert!(result.unwrap());
+	}
 
+	#[test]
+	fn test_resolve_with_fact_not_in_operation()
+	{
+		// !A => B
+		let rules = vec!(Rule
+		{
+			left: Factoken::Fact(Fact {name: 'A', not: true}),
+			right: Factoken::Fact(Fact {name: 'B', not: false}),
+			middle: Operators::Then
+		});
+
+		// ?B
+		let query = Fact {name: 'B', not: false};
+
+		// =A -> B should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'A', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+
+		// = -> B should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+	}
+
+	#[test]
+	fn test_resolve_with_fact_not_in_conclusion()
+	{
+		// A => !B
+		let rules = vec!(Rule
+		{
+			left: Factoken::Fact(Fact {name: 'A', not: false}),
+			right: Factoken::Fact(Fact {name: 'B', not: true}),
+			middle: Operators::Then
+		});
+
+		// ?B
+		let query = Fact {name: 'B', not: false};
+
+		// =A -> B should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'A', not: false}, Some(true));
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+
+		// = -> B should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		let result = query.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+	}
+
+	#[test]
+	fn test_resolve_with_multi_fact_in_conclusion()
+	{
+		// A => B + C + D
+		let rules = vec!(Rule
+		{
+			left: Factoken::Fact(Fact {name: 'A', not: false}),
+			right: Factoken::Operation(
+				Operation
+				{
+					operator: Operators::And,
+					facts: (Box::new(Factoken::Fact(Fact {name: 'B', not: false})), Box::new(Factoken::Operation(
+						Operation
+						{
+							operator: Operators::And,
+							facts: (Box::new(Factoken::Fact(Fact {name: 'C', not: false})), Box::new(Factoken::Fact(Fact {name: 'D', not: false}))),
+							raw: "C + D".into()
+						}
+					))),
+					raw: "B + C + D".into()
+				}
+			),
+			middle: Operators::Then
+		});
+
+		// ?B
+		let query_b = Fact {name: 'B', not: false};
+		// ?C
+		let query_c = Fact {name: 'C', not: false};
+		// ?D
+		let query_d = Fact {name: 'D', not: false};
+
+		// =A -> B, C and D should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'A', not: false}, Some(true));
+		let result = query_b.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'C', not: false}));
+		assert!(known.get(&Fact {name: 'C', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'D', not: false}));
+		assert!(known.get(&Fact {name: 'D', not: false}).unwrap().unwrap());
+		let result = query_c.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'B', not: false}));
+		assert!(known.get(&Fact {name: 'B', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'D', not: false}));
+		assert!(known.get(&Fact {name: 'D', not: false}).unwrap().unwrap());
+		let result = query_d.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'B', not: false}));
+		assert!(known.get(&Fact {name: 'B', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'C', not: false}));
+		assert!(known.get(&Fact {name: 'C', not: false}).unwrap().unwrap());
+
+		// = -> B, C and D should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		let result = query_b.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'C', not: false}));
+		assert!(!known.get(&Fact {name: 'C', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'D', not: false}));
+		assert!(!known.get(&Fact {name: 'D', not: false}).unwrap().unwrap());
+		let result = query_c.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'B', not: false}));
+		assert!(!known.get(&Fact {name: 'B', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'D', not: false}));
+		assert!(!known.get(&Fact {name: 'D', not: false}).unwrap().unwrap());
+		let result = query_d.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'B', not: false}));
+		assert!(!known.get(&Fact {name: 'B', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'C', not: false}));
+		assert!(!known.get(&Fact {name: 'C', not: false}).unwrap().unwrap());
+	}
+
+	#[test]
+	fn test_resolve_with_multi_fact_and_not_in_conclusion()
+	{
+		// A => B + !C + D
+		let rules = vec!(Rule
+		{
+			left: Factoken::Fact(Fact {name: 'A', not: false}),
+			right: Factoken::Operation(
+				Operation
+				{
+					operator: Operators::And,
+					facts: (Box::new(Factoken::Fact(Fact {name: 'B', not: false})), Box::new(Factoken::Operation(
+						Operation
+						{
+							operator: Operators::And,
+							facts: (Box::new(Factoken::Fact(Fact {name: 'C', not: true})), Box::new(Factoken::Fact(Fact {name: 'D', not: false}))),
+							raw: "!C + D".into()
+						}
+					))),
+					raw: "B + !C + D".into()
+				}
+			),
+			middle: Operators::Then
+		});
+
+		// ?B
+		let query_b = Fact {name: 'B', not: false};
+		// ?C
+		let query_c = Fact {name: 'C', not: false};
+		// ?D
+		let query_d = Fact {name: 'D', not: false};
+
+		// =A -> B and D should be TRUE, C should be FALSE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		known.insert(Fact{name: 'A', not: false}, Some(true));
+		let result = query_b.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'C', not: false}));
+		assert!(!known.get(&Fact {name: 'C', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'D', not: false}));
+		assert!(known.get(&Fact {name: 'D', not: false}).unwrap().unwrap());
+		let result = query_c.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'B', not: false}));
+		assert!(known.get(&Fact {name: 'B', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'D', not: false}));
+		assert!(known.get(&Fact {name: 'D', not: false}).unwrap().unwrap());
+		let result = query_d.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'B', not: false}));
+		assert!(known.get(&Fact {name: 'B', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'C', not: false}));
+		assert!(!known.get(&Fact {name: 'C', not: false}).unwrap().unwrap());
+
+		// = -> B and D should be FALSE, C should be TRUE
+		let mut known: HashMap<Fact, Option<bool>> = HashMap::new();
+		let result = query_b.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'C', not: false}));
+		assert!(known.get(&Fact {name: 'C', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'D', not: false}));
+		assert!(!known.get(&Fact {name: 'D', not: false}).unwrap().unwrap());
+		let result = query_c.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'B', not: false}));
+		assert!(!known.get(&Fact {name: 'B', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'D', not: false}));
+		assert!(!known.get(&Fact {name: 'D', not: false}).unwrap().unwrap());
+		let result = query_d.resolve(&rules, &mut known, &mut HashMap::new());
+		assert!(result.is_some());
+		assert!(!result.unwrap());
+		assert!(known.contains_key(&Fact {name: 'B', not: false}));
+		assert!(!known.get(&Fact {name: 'B', not: false}).unwrap().unwrap());
+		assert!(known.contains_key(&Fact {name: 'C', not: false}));
+		assert!(known.get(&Fact {name: 'C', not: false}).unwrap().unwrap());
 	}
 }
