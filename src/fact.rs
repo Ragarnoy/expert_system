@@ -154,11 +154,11 @@ mod test_fact
 		let f = Fact::new("A");
 		let g = Fact::new("!A");
 
-		assert_eq!(Err("`!`: this cannot be a fact".into()), a);
-		assert_eq!(Err("`AB`: this cannot be a fact".into()), b);
-		assert_eq!(Err("`a`: this cannot be a fact".into()), c);
-		assert_eq!(Err("`aB`: this cannot be a fact".into()), d);
-		assert_eq!(Err("`!a`: this cannot be a fact".into()), e);
+		assert_eq!(Err("`!`: we should have a fact around here".into()), a);
+		assert_eq!(Err("`AB`: declare more than 1 fact here is forbidden".into()), b);
+		assert_eq!(Err("`a` in `a`: illegal token".into()), c);
+		assert_eq!(Err("`a` in `aB`: illegal token".into()), d);
+		assert_eq!(Err("`a` in `!a`: illegal token".into()), e);
 		assert!(f.is_ok());
 		let f = f.unwrap();
 		assert!(f.name == 'A' && !f.not);
