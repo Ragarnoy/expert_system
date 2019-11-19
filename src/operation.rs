@@ -31,7 +31,7 @@ impl Operation
             operator,
             facts: (
                 Box::new(Factoken::new(left_part, left_priorities)?),
-                Box::new(Factoken::new(right_part, right_priorities)?)
+                Box::new(Factoken::new(right_part[1..], right_priorities)?)
             ),
             raw: input.into()
         })
