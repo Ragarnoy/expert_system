@@ -13,7 +13,7 @@ impl Operation
     // The value to pass for `priorities` should comes from the get_operators_sorted_by_priority() method.
     // Actually we obviously can get this priority list directly inside this method but I want to avoid doing the same thing
     // multiple times on the same (or part of the same) object. That also reduce the complexity of this method
-    pub fn new<T>(input: &str, mut priorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
+    pub fn new(input: &str, mut priorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
     {
         if priorities.is_empty()
         {

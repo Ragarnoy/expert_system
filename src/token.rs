@@ -17,11 +17,11 @@ impl Default for Factoken
 
 impl Factoken
 {
-	pub fn new(input: &str) -> Result<Self, String>
+	pub fn new(input: &str, priorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
 	{
 		Ok(if Operators::is_present(input)
 		{
-			Factoken::Operation(Operation::new(input)?)
+			Factoken::Operation(Operation::new(input, priorities)?)
 		}
 		else
 		{
