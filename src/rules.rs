@@ -44,8 +44,8 @@ impl Rule
 			let mut parts = input.split("=>");
 			let left = parts.next().unwrap_or("");
 			let right = parts.next().unwrap_or("");
-            let left_p = Operation::get_operators_sorted_by_priority(left);
-            let right_p = Operation::get_operators_sorted_by_priority(right);
+            let left_p = Operation::get_operators_sorted_by_priority(left)?;
+            let right_p = Operation::get_operators_sorted_by_priority(right)?;
 			Ok(Rule
 			{
 				left: Factoken::new(left, left_p)?,
@@ -58,8 +58,8 @@ impl Rule
 			let mut parts = input.split("<=>");
 			let left = parts.next().unwrap_or("");
 			let right = parts.next().unwrap_or("");
-            let left_p = Operation::get_operators_sorted_by_priority(left);
-            let right_p = Operation::get_operators_sorted_by_priority(right);
+            let left_p = Operation::get_operators_sorted_by_priority(left)?;
+            let right_p = Operation::get_operators_sorted_by_priority(right)?;
 			Ok(Rule
 			{
 				left: Factoken::new(left, left_p)?,
