@@ -86,6 +86,10 @@ fn main()
     let file = Path::new(matches.value_of("input").unwrap());
 
     let content = fs::read_to_string(file).unwrap();
+	if !content.is_ascii()
+	{
+		eprintln!("expert-system: parsing error: the input file MUST contains only ASCII characters");
+	}
 
     match parse_and_return(content)
     {
