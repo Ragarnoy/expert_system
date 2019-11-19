@@ -15,6 +15,7 @@ impl Rule
 	{
 		// TODO: We should search here for duplicated fact
 		// in both operation and conclusion side.
+		// Or maybe not, is it so bad to have the same fact declared multiple times ?
 
         // TODO: We could (should ?) use match_indices() instead of matches here
         // then pass use string slice instead of call split().
