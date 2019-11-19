@@ -10,7 +10,7 @@ pub struct Operation
 
 impl Operation
 {
-	pub fn new(input: &str) -> Result<Self, String>
+	pub fn new(input: &str, priorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
 	{
 		// TODO: Implement me
 		Ok(Self::default())
