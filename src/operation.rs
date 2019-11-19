@@ -21,7 +21,7 @@ impl Operation
         }
         let (index, _, operator) = priorities.remove(0);
         let (left_priorities, mut right_priorities): (Vec<(usize, usize, Operators)>, Vec<(usize, usize, Operators)>) = priorities.iter().partition(|(i, _, _)| *i <= index);
-        for (ref mut i, _, _) in right_priorities
+        for (i, _, _) in right_priorities.iter_mut()
         {
             *i -= index + 1;
         }
@@ -31,7 +31,7 @@ impl Operation
             operator,
             facts: (
                 Box::new(Factoken::new(left_part, left_priorities)?),
-                Box::new(Factoken::new(right_part[1..], right_priorities)?)
+                Box::new(Factoken::new(&right_part[1..], right_priorities)?)
             ),
             raw: input.into()
         })
