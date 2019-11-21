@@ -8,8 +8,8 @@ use std::{
 #[derive(Default, Debug, Eq, Copy, Clone)]
 pub struct Fact
 {
-	pub name: char,
-	pub not: bool,
+	name: char,
+	not: bool,
 }
 
 impl PartialEq for Fact

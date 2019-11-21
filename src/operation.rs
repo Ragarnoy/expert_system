@@ -9,9 +9,9 @@ use std::{
 #[derive(Debug, Default, Clone)]
 pub struct Operation
 {
-    pub operator: Operators,
-    pub facts: (Box<Factoken>, Box<Factoken>),
-	pub raw: String
+    operator: Operators,
+	facts: (Box<Factoken>, Box<Factoken>),
+	raw: String
 }
 
 impl PartialEq for Operation

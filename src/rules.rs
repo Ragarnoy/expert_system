@@ -4,9 +4,9 @@ use std::{collections::HashMap, iter::FromIterator};
 #[derive(Default, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Rule 
 {
-    pub left: Factoken,
-    pub right: Factoken,
-    pub middle: Operators,
+    left: Factoken,
+    right: Factoken,
+    middle: Operators,
 }
 
 impl Rule
