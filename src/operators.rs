@@ -69,3 +69,25 @@ impl Operators
 		input.contains(operators)
 	}
 }
+
+#[cfg(test)]
+mod test_operators
+{
+	use super::*;
+
+	#[test]
+	fn test_new()
+	{
+		let op_and = Operators::new("+").unwrap();
+		let op_or = Operators::new("|").unwrap();
+		let op_xor = Operators::new("^").unwrap();
+		let op_then = Operators::new("=>").unwrap();
+		let op_if_only = Operators::new("<=>").unwrap();
+
+		assert_eq!(Operators::And, op_and);
+		assert_eq!(Operators::Or, op_or);
+		assert_eq!(Operators::Xor, op_xor);
+		assert_eq!(Operators::Then, op_then);
+		assert_eq!(Operators::IfOnly, op_if_only);
+	}
+}
