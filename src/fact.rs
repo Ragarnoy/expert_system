@@ -277,12 +277,7 @@ mod test_fact
 	fn test_resolve_with_fact_not_in_operation()
 	{
 		// !A => B
-		let rules = vec!(Rule
-		{
-			left: Factoken::Fact(Fact {name: 'A', not: true}),
-			right: Factoken::Fact(Fact {name: 'B', not: false}),
-			middle: Operators::Then
-		});
+		let rules = vec!(Rule::new("!A => B").unwrap());
 
 		// ?B
 		let query = Fact {name: 'B', not: false};
@@ -305,12 +300,7 @@ mod test_fact
 	fn test_resolve_with_fact_not_in_conclusion()
 	{
 		// A => !B
-		let rules = vec!(Rule
-		{
-			left: Factoken::Fact(Fact {name: 'A', not: false}),
-			right: Factoken::Fact(Fact {name: 'B', not: true}),
-			middle: Operators::Then
-		});
+		let rules = vec!(Rule::new("A => !B").unwrap());
 
 		// ?B
 		let query = Fact {name: 'B', not: false};
@@ -333,26 +323,7 @@ mod test_fact
 	fn test_resolve_with_multi_fact_in_conclusion()
 	{
 		// A => B + C + D
-		let rules = vec!(Rule
-		{
-			left: Factoken::Fact(Fact {name: 'A', not: false}),
-			right: Factoken::Operation(
-				Operation
-				{
-					operator: Operators::And,
-					facts: (Box::new(Factoken::Fact(Fact {name: 'B', not: false})), Box::new(Factoken::Operation(
-						Operation
-						{
-							operator: Operators::And,
-							facts: (Box::new(Factoken::Fact(Fact {name: 'C', not: false})), Box::new(Factoken::Fact(Fact {name: 'D', not: false}))),
-							raw: "C + D".into()
-						}
-					))),
-					raw: "B + C + D".into()
-				}
-			),
-			middle: Operators::Then
-		});
+		let rules = vec!(Rule::new("A => B + C + D").unwrap());
 
 		// ?B
 		let query_b = Fact {name: 'B', not: false};
@@ -415,26 +386,7 @@ mod test_fact
 	fn test_resolve_with_multi_fact_and_not_in_conclusion()
 	{
 		// A => B + !C + D
-		let rules = vec!(Rule
-		{
-			left: Factoken::Fact(Fact {name: 'A', not: false}),
-			right: Factoken::Operation(
-				Operation
-				{
-					operator: Operators::And,
-					facts: (Box::new(Factoken::Fact(Fact {name: 'B', not: false})), Box::new(Factoken::Operation(
-						Operation
-						{
-							operator: Operators::And,
-							facts: (Box::new(Factoken::Fact(Fact {name: 'C', not: true})), Box::new(Factoken::Fact(Fact {name: 'D', not: false}))),
-							raw: "!C + D".into()
-						}
-					))),
-					raw: "B + !C + D".into()
-				}
-			),
-			middle: Operators::Then
-		});
+		let rules = vec!(Rule::new("A => B + !C + D").unwrap());
 
 		// ?B
 		let query_b = Fact {name: 'B', not: false};
