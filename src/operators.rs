@@ -1,4 +1,4 @@
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 // Please don't touch to the ordering.
 // The order of the 3 first operators is used to determine
 // the priority of an operator by casting the enum into a u32.
@@ -30,13 +30,27 @@ impl Operators
 				'+' => Ok(Operators::And),
 				'|' => Ok(Operators::Or),
 				'^' => Ok(Operators::Xor),
-				_ => Err(format!("`{}`: this cannot be an operators", input))
+				_ => Err(format!("`{}`: this cannot be an operator", input))
 			},
 			2 if input == "=>" => Ok(Operators::Then),
 			3 if input == "<=>" => Ok(Operators::IfOnly),
-			_ => Err(format!("`{}`: this cannot be an operators", input))
+			_ => Err(format!("`{}`: this cannot be an operator", input))
 		}
-    }
+	}
+
+    #[inline]
+	pub fn then() -> &'static str
+	{
+		static then: &str = "=>";
+		then
+	}
+
+    #[inline]
+	pub fn if_only() -> &'static str
+	{
+		static if_only: &str = "<=>";
+		if_only
+	}
 
     #[inline]
     pub fn is_operator(c: char) -> bool
@@ -45,24 +59,22 @@ impl Operators
     }
 
     // Here `depth` should represent how deep we are inside parentheses
-    pub fn get_priority(self, depth: isize) -> Option<usize>
+    #[inline]
+    pub fn get_priority(self, depth: isize) -> usize
     {
         let highest = Operators::get_highest_priority();
         let priority = self as usize + 1;
 
-        if priority > highest || depth < 0
-        {
-            return None;
-        }
-        Some(highest * depth as usize + priority)
+        highest * depth as usize + priority
     }
 
     #[inline]
-    fn get_highest_priority() -> usize
+    pub fn get_highest_priority() -> usize
     {
         Operators::And as usize + 1
 	}
 
+    #[inline]
 	pub fn is_present(input: &str) -> bool
 	{
 		static operators: &[char] = &['+', '|', '^'];

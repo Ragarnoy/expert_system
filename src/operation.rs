@@ -19,19 +19,32 @@ impl Operation
         {
             return Err(format!("`{}`: an operation must contains at least 1 operator (`+`, `|` or `^`)", input))
         }
-        let (index, _, operator) = priorities.remove(0);
+		let (index, priority, operator) = priorities.remove(0);
+		let depth = (priority - (operator as usize + 1)) / Operators::get_highest_priority();
         let (left_priorities, mut right_priorities): (Vec<(usize, usize, Operators)>, Vec<(usize, usize, Operators)>) = priorities.iter().partition(|(i, _, _)| *i <= index);
         for (i, _, _) in right_priorities.iter_mut()
         {
-            *i -= index + 1;
-        }
-        let (left_part, right_part) = input.split_at(index);
+			let offset = (index as isize + 1) - depth as isize;
+			if offset < 0
+			{
+				*i += (-offset) as usize
+			}
+			else
+			{
+				*i -= offset as usize
+			}
+		}
+		let (left_part, right_part_tmp) = input.split_at(index);
+		let mut left_part: String = left_part.into();
+		let mut right_part = "(".repeat(depth);
+		left_part.push_str(&")".repeat(depth));
+		right_part.push_str(&right_part_tmp[1..]);
         Ok(Operation
         {
             operator,
             facts: (
-                Box::new(Factoken::new(left_part, left_priorities)?),
-                Box::new(Factoken::new(&right_part[1..], right_priorities)?)
+                Box::new(Factoken::new(&left_part, left_priorities)?),
+                Box::new(Factoken::new(&right_part, right_priorities)?)
             ),
             raw: input.into()
         })
@@ -50,7 +63,7 @@ impl Operation
                 c if Operators::is_operator(c) => {
                     let op = Operators::new(std::str::from_utf8(&[c as u8]).unwrap_or(""));
                     let op = op.unwrap();
-                    priorities.push((i, op.get_priority(depth).unwrap(), op))
+                    priorities.push((i, op.get_priority(depth), op))
                 },
                 'A'..='Z' | '!' => continue,
                 c if c.is_ascii_whitespace() => continue,
