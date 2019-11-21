@@ -1,4 +1,4 @@
-use crate::{fact::Fact, operation::Operation, rules::Rule};
+use crate::{fact::Fact, operation::Operation, rules::Rule, operators::Operators};
 use std::{fmt, collections::HashMap};
 
 #[derive(Debug, Clone, Eq, Hash)]
@@ -43,6 +43,18 @@ impl fmt::Display for Factoken
 
 impl Factoken
 {
+	pub fn new(input: &str, priorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
+	{
+		Ok(if Operators::is_present(input)
+		{
+			Factoken::Operation(Operation::new(input, priorities)?)
+		}
+		else
+		{
+			Factoken::Fact(Fact::new(input)?)
+		})
+	}
+
 	pub fn resolve(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> Option<bool>
 	{
 		match self

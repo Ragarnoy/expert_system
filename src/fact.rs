@@ -190,50 +190,9 @@ mod test_fact
 	#[test]
 	fn test_resolve()
 	{
-		let rules = vec!(
 		// A | B + C => E
-		Rule
-		{
-			left: Factoken::Operation(
-				Operation
-				{
-					operator: Operators::Or,
-					facts: (Box::new(Factoken::Fact(Fact {name: 'A', not: false})), Box::new(Factoken::Operation(
-						Operation
-						{
-							operator: Operators::And,
-							facts: (Box::new(Factoken::Fact(Fact {name: 'B', not: false})), Box::new(Factoken::Fact(Fact {name: 'C', not: false}))),
-							raw: "B + C".into()
-						}
-					))),
-					raw: "A | B + C".into()
-				}
-			),
-			right: Factoken::Fact(Fact {name: 'E', not: false}),
-			middle: Operators::Then
-		},
-
 		// (F | G) + H => E
-		Rule
-		{
-			left: Factoken::Operation(
-				Operation
-				{
-					operator: Operators::And,
-					facts: (Box::new(Factoken::Operation(
-						Operation
-						{
-							operator: Operators::Or,
-							facts: (Box::new(Factoken::Fact(Fact {name: 'F', not: false})), Box::new(Factoken::Fact(Fact {name: 'G', not: false}))),
-							raw: "(F | G)".into()
-						}
-					)), Box::new(Factoken::Fact(Fact {name: 'H', not: false}))),
-					raw: "(F | G) + H".into()
-				}
-			),
-			right: Factoken::Fact(Fact {name: 'E', not: false}),
-			middle: Operators::Then
-		});
+		let rules = vec!(Rule::new("A | B + C => E").unwrap(), Rule::new("(F | G) + H => E").unwrap());
 
 		// ?E
 		let query = Fact {name: 'E', not: false};
