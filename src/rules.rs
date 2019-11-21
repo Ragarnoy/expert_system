@@ -54,3 +54,16 @@ impl Rule
 		}
 	}
 }
+
+#[cfg(test)]
+mod rule_tests
+{
+	use super::*;
+
+	#[test]
+	fn test_constructeur()
+	{
+		let rule = Rule::new("A | (B + C) => D");
+		println!("Rule: {:#?}", rule)
+	}
+}
