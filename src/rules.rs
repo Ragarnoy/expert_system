@@ -11,42 +11,38 @@ pub struct Rule
 
 impl Rule
 {
+	pub fn from_operator(input: &str, index: usize, operator: &str) -> Result<Self, String>
+	{
+		let left = &input[..index];
+		let right = &input[index + operator.len()..];
+		let left_p = Operation::get_operators_sorted_by_priority(&left)?;
+		let right_p = Operation::get_operators_sorted_by_priority(&right)?;
+
+		Ok(Rule
+		{
+			left: Factoken::new(left, left_p)?,
+			right: Factoken::new(right, right_p)?,
+			middle: Operators::Then
+		})
+	}
+
 	pub fn new(input: &str) -> Result<Self, String>
 	{
 		// TODO: We should search here for duplicated fact
 		// in both operation and conclusion side.
 		// Or maybe not, is it so bad to have the same fact declared multiple times ?
+		let mut then = input.match_indices(Operators::then());
+		let mut if_only = input.match_indices(Operators::if_only());
 
-        // TODO: We could (should ?) use match_indices() instead of matches here
-        // then pass use string slice instead of call split().
-        // This way is probably faster than the current one.
-		if input.matches("=>").count() == 1
+		if then.clone().count() == 1 && if_only.clone().count() == 0
 		{
-			let mut parts = input.split("=>");
-			let left = parts.next().unwrap_or("");
-			let right = parts.next().unwrap_or("");
-            let left_p = Operation::get_operators_sorted_by_priority(left)?;
-            let right_p = Operation::get_operators_sorted_by_priority(right)?;
-			Ok(Rule
-			{
-				left: Factoken::new(left, left_p)?,
-				right: Factoken::new(right, right_p)?,
-				middle: Operators::Then
-			})
+			let (index, then) = then.next().unwrap();
+			Self::from_operator(input, index, then)
 		}
-		else if input.matches("<=>").count() == 1
+		else if if_only.clone().count() == 1 && then.clone().count() == 0
 		{
-			let mut parts = input.split("<=>");
-			let left = parts.next().unwrap_or("");
-			let right = parts.next().unwrap_or("");
-            let left_p = Operation::get_operators_sorted_by_priority(left)?;
-            let right_p = Operation::get_operators_sorted_by_priority(right)?;
-			Ok(Rule
-			{
-				left: Factoken::new(left, left_p)?,
-				right: Factoken::new(right, right_p)?,
-				middle: Operators::IfOnly
-			})
+			let (index, if_only) = if_only.next().unwrap();
+			Self::from_operator(input, index, if_only)
 		}
 		else
 		{
