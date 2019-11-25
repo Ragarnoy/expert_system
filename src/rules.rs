@@ -31,46 +31,42 @@ impl Rule
 		self.right.contains_fact(fact)
 	}
 
+	pub fn from_operator(input: &str, index: usize, operator: &str) -> Result<Self, String>
+	{
+		let left = &input[..index];
+		let right = &input[index + operator.len()..];
+		let left_p = Operation::get_operators_sorted_by_priority(&left)?;
+		let right_p = Operation::get_operators_sorted_by_priority(&right)?;
+
+		Ok(Rule
+		{
+			left: Factoken::new(left, left_p)?,
+			right: Factoken::new(right, right_p)?,
+			middle: Operators::Then
+		})
+	}
+
 	pub fn new(input: &str) -> Result<Self, String>
 	{
 		// TODO: We should search here for duplicated fact
 		// in both operation and conclusion side.
 		// Or maybe not, is it so bad to have the same fact declared multiple times ?
+		let mut op = input.match_indices("=>");
+		// let mut op = op.chain(input.match_indices("<=>"));
+		let operator = op.next();
 
-        // TODO: We could (should ?) use match_indices() instead of matches here
-        // then pass use string slice instead of call split().
-        // This way is probably faster than the current one.
-		if input.matches("=>").count() == 1
+		if input.contains("<=>")
 		{
-			let mut parts = input.split("=>");
-			let left = parts.next().unwrap_or("");
-			let right = parts.next().unwrap_or("");
-            let left_p = Operation::get_operators_sorted_by_priority(left)?;
-            let right_p = Operation::get_operators_sorted_by_priority(right)?;
-			Ok(Rule
-			{
-				left: Factoken::new(left, left_p)?,
-				right: Factoken::new(right, right_p)?,
-				middle: Operators::Then
-			})
+			Err(format!("sorry, we don't support `<=>` operator: `{}`", input))
 		}
-		else if input.matches("<=>").count() == 1
+		else if operator.is_none() || op.count() != 0
 		{
-			let mut parts = input.split("<=>");
-			let left = parts.next().unwrap_or("");
-			let right = parts.next().unwrap_or("");
-            let left_p = Operation::get_operators_sorted_by_priority(left)?;
-            let right_p = Operation::get_operators_sorted_by_priority(right)?;
-			Ok(Rule
-			{
-				left: Factoken::new(left, left_p)?,
-				right: Factoken::new(right, right_p)?,
-				middle: Operators::IfOnly
-			})
+			Err(format!("a rule MUST contains exactly one `=>` OR `<=>` operator: `{}`", input))
 		}
 		else
 		{
-			Err(format!("a rule MUST contains exactly one `=>` OR `<=>` operator: {}", input))
+			let (index, operator) = operator.unwrap();
+			Self::from_operator(input, index, operator)
 		}
 	}
 }
