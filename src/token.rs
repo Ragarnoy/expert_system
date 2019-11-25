@@ -1,4 +1,4 @@
-use crate::{fact::Fact, operation::Operation, rules::Rule};
+use crate::{fact::Fact, operation::Operation, rules::Rule, operators::Operators};
 use std::{fmt, collections::HashMap};
 
 #[derive(Debug, Clone, Eq, Hash)]
@@ -18,7 +18,7 @@ impl Default for Factoken
 
 impl Factoken
 {
-	pub fn new(input: &str) -> Result<Self, String>
+	pub fn new(input: &str, piorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
 	{
 		// TODO: Implement me
 		Ok(Self::default())
