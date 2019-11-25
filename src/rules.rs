@@ -51,22 +51,22 @@ impl Rule
 		// TODO: We should search here for duplicated fact
 		// in both operation and conclusion side.
 		// Or maybe not, is it so bad to have the same fact declared multiple times ?
-		let mut then = input.match_indices(Operators::then());
-		let mut if_only = input.match_indices(Operators::if_only());
+		let mut op = input.match_indices("=>");
+		// let mut op = op.chain(input.match_indices("=>"));
+		let operator = op.next();
 
-		if then.clone().count() == 1 && if_only.clone().count() == 0
+		if input.contains("<=>")
 		{
-			let (index, then) = then.next().unwrap();
-			Self::from_operator(input, index, then)
+			Err(format!("sorry, we don't support `<=>` operator: `{}`", input))
 		}
-		else if if_only.clone().count() == 1 && then.clone().count() == 0
+		else if operator.is_none() || op.count() != 0
 		{
-			let (index, if_only) = if_only.next().unwrap();
-			Self::from_operator(input, index, if_only)
+			Err(format!("a rule MUST contains exactly one `=>` OR `<=>` operator: `{}`", input))
 		}
 		else
 		{
-			Err(format!("a rule MUST contains exactly one `=>` OR `<=>` operator: {}", input))
+			let (index, operator) = operator.unwrap();
+			Self::from_operator(input, index, operator)
 		}
 	}
 }
