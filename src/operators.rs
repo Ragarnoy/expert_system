@@ -60,15 +60,15 @@ impl Operators
     #[inline]
 	pub fn then() -> &'static str
 	{
-		static then: &str = "=>";
-		then
+		static THEN: &str = "=>";
+		THEN
 	}
 
     #[inline]
 	pub fn if_only() -> &'static str
 	{
-		static if_only: &str = "<=>";
-		if_only
+		static IF_ONLY: &str = "<=>";
+		IF_ONLY
 	}
 
     #[inline]
