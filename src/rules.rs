@@ -1,4 +1,4 @@
-use crate::{operators::Operators, token::Factoken, fact::Fact};
+use crate::{operators::Operators, token::Factoken, fact::Fact, operation::Operation};
 use std::{collections::HashMap, iter::FromIterator};
 
 #[derive(Default, Debug, PartialEq, Eq, Hash, Clone)]
@@ -29,5 +29,44 @@ impl Rule
 	pub fn contains_fact_as_conclusion(&self, fact: &Fact) -> bool
 	{
 		self.right.contains_fact(fact)
+	}
+
+	pub fn from_operator(input: &str, index: usize, operator: &str) -> Result<Self, String>
+	{
+		let left = &input[..index];
+		let right = &input[index + operator.len()..];
+		let left_p = Operation::get_operators_sorted_by_priority(&left)?;
+		let right_p = Operation::get_operators_sorted_by_priority(&right)?;
+
+		Ok(Rule
+		{
+			left: Factoken::new(left, left_p)?,
+			right: Factoken::new(right, right_p)?,
+			middle: Operators::Then
+		})
+	}
+
+	pub fn new(input: &str) -> Result<Self, String>
+	{
+		// TODO: We should search here for duplicated fact
+		// in both operation and conclusion side.
+		// Or maybe not, is it so bad to have the same fact declared multiple times ?
+		let mut op = input.match_indices("=>");
+		// let mut op = op.chain(input.match_indices("<=>"));
+		let operator = op.next();
+
+		if input.contains("<=>")
+		{
+			Err(format!("sorry, we don't support `<=>` operator: `{}`", input))
+		}
+		else if operator.is_none() || op.count() != 0
+		{
+			Err(format!("a rule MUST contains exactly one `=>` OR `<=>` operator: `{}`", input))
+		}
+		else
+		{
+			let (index, operator) = operator.unwrap();
+			Self::from_operator(input, index, operator)
+		}
 	}
 }

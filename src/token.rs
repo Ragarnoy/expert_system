@@ -1,4 +1,4 @@
-use crate::{fact::Fact, operation::Operation, rules::Rule};
+use crate::{fact::Fact, operation::Operation, rules::Rule, operators::Operators};
 use std::{fmt, collections::HashMap};
 
 #[derive(Debug, Clone, Eq, Hash)]
@@ -16,6 +16,14 @@ impl Default for Factoken
 	}
 }
 
+impl Factoken
+{
+	pub fn new(input: &str, piorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
+	{
+		// TODO: Implement me
+		Ok(Self::default())
+	}
+}
 impl PartialEq for Factoken
 {
 	fn eq(&self, other: &Self) -> bool
