@@ -43,11 +43,11 @@ impl fmt::Display for Factoken
 
 impl Factoken
 {
-	pub fn new(input: &str, priorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
+	pub fn new(input: &str, priorities: Vec<(usize, usize, Operators)>, previous_depth: usize) -> Result<Self, String>
 	{
 		Ok(if Operators::is_present(input)
 		{
-			Factoken::Operation(Operation::new(input, priorities)?)
+			Factoken::Operation(Operation::new(input, priorities, previous_depth)?)
 		}
 		else
 		{

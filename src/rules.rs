@@ -40,8 +40,8 @@ impl Rule
 
 		Ok(Rule
 		{
-			left: Factoken::new(left, left_p)?,
-			right: Factoken::new(right, right_p)?,
+			left: Factoken::new(left, left_p, 0)?,
+			right: Factoken::new(right, right_p, 0)?,
 			middle: Operators::Then
 		})
 	}

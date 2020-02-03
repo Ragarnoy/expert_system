@@ -11,6 +11,7 @@ pub struct Operation
 {
     operator: Operators,
 	facts: (Box<Factoken>, Box<Factoken>),
+	not: bool,
 	raw: String
 }
 
@@ -57,7 +58,11 @@ impl Operation
     // The value to pass for `priorities` should comes from the get_operators_sorted_by_priority() method.
     // Actually we obviously can get this priority list directly inside this method but I want to avoid doing the same thing
     // multiple times on the same (or part of the same) object. That also reduce the complexity of this method
-    pub fn new(input: &str, mut priorities: Vec<(usize, usize, Operators)>) -> Result<Self, String>
+
+	// We have a problem here, we should be able to know if we are between parentheses and if there is a NOT (!) which applies to this operation.
+	// At least I think we need to know the previous depth in order to be able to know if we just "enter" parentheses and from this data we should
+	// be able to read backward to see if this operation has to be a NOT one.
+    pub fn new(input: &str, mut priorities: Vec<(usize, usize, Operators)>, previous_depth: usize) -> Result<Self, String>
     {
         if priorities.is_empty()
         {
@@ -65,6 +70,19 @@ impl Operation
         }
 		let (index, priority, operator) = priorities.remove(0);
 		let depth = (priority - (operator as usize + 1)) / Operators::get_highest_priority();
+		let mut depth_diff = depth as isize - previous_depth as isize;
+		if depth_diff > 0
+		{
+			match input[..index].rmatch_indices('(').nth((depth_diff - 1) as usize)
+			{
+				Some((i, _)) => input[..i].fold(),
+				None => return Err(format!("`{}`: parentheses error", input))
+			};
+			// for (i, c) in input[..index].char_indices().rev()
+			// {
+				
+			// }
+		}
         let (left_priorities, mut right_priorities): (Vec<(usize, usize, Operators)>, Vec<(usize, usize, Operators)>) = priorities.iter().partition(|(i, _, _)| *i <= index);
         for (i, _, _) in right_priorities.iter_mut()
         {
@@ -87,8 +105,8 @@ impl Operation
         {
             operator,
             facts: (
-                Box::new(Factoken::new(&left_part, left_priorities)?),
-                Box::new(Factoken::new(&right_part, right_priorities)?)
+                Box::new(Factoken::new(&left_part, left_priorities, depth)?),
+                Box::new(Factoken::new(&right_part, right_priorities, depth)?)
             ),
             raw: input.into()
         })
@@ -100,6 +118,32 @@ impl Operation
         let mut priorities: Vec<(usize, usize, Operators)> = Vec::new();
         for (i, c) in input.char_indices()
         {
+		
+
+
+
+				// '(' => depth += 1,
+				// ')' => depth -= 1,
+				// '!' => match not {
+				// 	Some((prev_i, prev_v)) if prev_i + 1 == i => not = Some((i, !prev_v)),
+				// 	None if fact.is_some() => return Err(format!("`{}`: a fact cannot be declared with a NOT (`!`) after its name", input)),
+				// 	None => not = Some((i, true)),
+				// 	_ => return Err(format!("`{}`: NOT (`!`) is allowed only next to (excluding whitespaces) another NOT or a fact's name", input))
+				// },
+				// c if c.is_ascii_uppercase() => match not {
+				// 	Some((index, _)) if index + 1 != i => return Err(format!("`{}`: NOT (`!`) is allowed only next to (excluding whitespaces) another NOT or a fact's name", input)),
+				// 	_ if fact.is_some() => return Err(format!("`{}`: declare more than 1 fact here is forbidden", input)),
+				// 	_ => fact = Some(c)
+				// },
+				// _ => return Err(format!("`{}` in `{}`: illegal token", c, input))
+
+
+
+
+
+
+
+
             match c
             {
                 '(' => depth += 1,
@@ -127,6 +171,7 @@ impl Operation
 		self.operator.resolve(self.facts.0.resolve(rules, known, seen), self.facts.1.resolve(rules, known, seen))
 	}
 
+	// TODO: Verify that we really don't use the three first (excluding `self`) param and if so remove them.
 	pub fn resolve_as_conclusion(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>
 	{
 		// TODO: Handle OR and XOR conclusions
@@ -164,5 +209,10 @@ impl Operation
 	pub fn contains_fact(&self, fact: &Fact) -> bool
 	{
 		self.facts.0.contains_fact(fact) || self.facts.1.contains_fact(fact)
+	}
+
+	pub fn is_not(&self) -> bool
+	{
+		self.not
 	}
 }
