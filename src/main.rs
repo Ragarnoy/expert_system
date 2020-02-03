@@ -107,6 +107,7 @@ fn parse(input: String) -> Result<(Vec<Rule>, Vec<Fact>, Vec<Fact>), String>
 		Some(line)
 	})
 	{
+		// This case probably makes no sense
 		let line = line.trim();
 		if line.is_empty()
 		{
@@ -119,11 +120,11 @@ fn parse(input: String) -> Result<(Vec<Rule>, Vec<Fact>, Vec<Fact>), String>
 			// we will just add more queries/initial facts in the corresponding list,
 			// it's on purpose and it seems to be an acceptable behavior to me.
 			// However, it's maybe not what we want.
-			"=" => get_facts_in_line(&line[1..], &mut initials)?,
-			"?" => {
-				get_facts_in_line(&line[1..], &mut queries)?;
+			"=" => {
+				get_facts_in_line(&line[1..], &mut initials)?;
 				initials_mark = true;
 			},
+			"?" => get_facts_in_line(&line[1..], &mut queries)?,
 			_ => rules.push(Rule::new(line)?)
 		}
 	}
@@ -137,7 +138,7 @@ fn parse(input: String) -> Result<(Vec<Rule>, Vec<Fact>, Vec<Fact>), String>
 	}
 	if !initials_mark
 	{
-		return Err("the input file must contains at an initial facts mark `=` - e.g: `=` to declare all facts as FALSE or `=AB` to declare both `A` and `B` as TRUE".into());
+		return Err("the input file must contains at least an initial facts mark `=` - e.g: `=` to declare all facts as FALSE or `=AB` to declare both `A` and `B` as TRUE".into());
 	}
 	Ok((rules, initials, queries))
 }
