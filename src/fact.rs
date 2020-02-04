@@ -53,13 +53,13 @@ impl Fact
 				'(' => depth += 1,
 				')' => depth -= 1,
 				'!' => match not {
-					Some((prev_i, prev_v)) if prev_i + 1 == i => not = Some((i, !prev_v)),
-					None if fact.is_some() => return Err(format!("`{}`: a fact cannot be declared with a NOT (`!`) after its name", input)),
-					None => not = Some((i, true)),
-					_ => return Err(format!("`{}`: NOT (`!`) is allowed only next to (excluding whitespaces) another NOT or a fact's name", input))
+					Some((_, prev_v)) if fact.is_none()/*if prev_i + 1 == i */=> not = Some((i, !prev_v)),
+					None if fact.is_none() => not = Some((i, true)),
+					_ if fact.is_some() => return Err(format!("`{}`: a fact cannot be declared with a NOT (`!`) after its name", input)),
+					_ => return Err(format!("`{}`: NOT (`!`) is allowed only next to (excluding whitespaces) another NOT, a fact's name or an enparenthesed operation", input))
 				},
 				c if c.is_ascii_uppercase() => match not {
-					Some((index, _)) if index + 1 != i => return Err(format!("`{}`: NOT (`!`) is allowed only next to (excluding whitespaces) another NOT or a fact's name", input)),
+					// Some((index, _)) /*if index + 1 != i*/ => return Err(format!("`{}`: NOT (`!`) is allowed only next to (excluding whitespaces) another NOT, a fact's name or an enparenthesed operation", input)),
 					_ if fact.is_some() => return Err(format!("`{}`: declare more than 1 fact here is forbidden", input)),
 					_ => fact = Some(c)
 				},

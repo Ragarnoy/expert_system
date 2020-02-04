@@ -70,19 +70,38 @@ impl Operation
         }
 		let (index, priority, operator) = priorities.remove(0);
 		let depth = (priority - (operator as usize + 1)) / Operators::get_highest_priority();
-		let mut depth_diff = depth as isize - previous_depth as isize;
+		let depth_diff = depth as isize - previous_depth as isize;
+		let mut nb_not: u32 = 0;
+		let mut not_pos: Vec<usize> = Vec::new();
 		if depth_diff > 0
 		{
-			match input[..index].rmatch_indices('(').nth((depth_diff - 1) as usize)
+			nb_not = match input[..index].match_indices('(').nth(depth - 1)
 			{
-				Some((i, _)) => input[..i].fold(),
+				Some((i, _)) => input[..i].char_indices().rev().take_while(|c| c.1.is_ascii_whitespace() || (*c).1 == '!').fold(0 as u32, |a, c| {
+					match c.1
+					{
+						'!' => {
+							not_pos.push(c.0);
+							a + 1
+						},
+						_ => a
+					}
+				}),
+				// The following case should never happens, it's just for security
 				None => return Err(format!("`{}`: parentheses error", input))
 			};
-			// for (i, c) in input[..index].char_indices().rev()
-			// {
-				
-			// }
 		}
+		let mut notless_input = input.to_string();
+		if !not_pos.is_empty()
+		{
+			let end = not_pos.first().unwrap() + 1;
+			let start = *not_pos.last().unwrap_or(&end);
+			let mut tmp = input[..start].to_string();
+			tmp.push_str(" ".repeat((end) - start).as_str());
+			tmp.push_str(&input[end..]);
+			notless_input = tmp;
+		}
+		let input = notless_input;
         let (left_priorities, mut right_priorities): (Vec<(usize, usize, Operators)>, Vec<(usize, usize, Operators)>) = priorities.iter().partition(|(i, _, _)| *i <= index);
         for (i, _, _) in right_priorities.iter_mut()
         {
@@ -108,6 +127,7 @@ impl Operation
                 Box::new(Factoken::new(&left_part, left_priorities, depth)?),
                 Box::new(Factoken::new(&right_part, right_priorities, depth)?)
             ),
+			not: nb_not.checked_rem(2).unwrap() != 0,
             raw: input.into()
         })
     }
@@ -118,32 +138,6 @@ impl Operation
         let mut priorities: Vec<(usize, usize, Operators)> = Vec::new();
         for (i, c) in input.char_indices()
         {
-		
-
-
-
-				// '(' => depth += 1,
-				// ')' => depth -= 1,
-				// '!' => match not {
-				// 	Some((prev_i, prev_v)) if prev_i + 1 == i => not = Some((i, !prev_v)),
-				// 	None if fact.is_some() => return Err(format!("`{}`: a fact cannot be declared with a NOT (`!`) after its name", input)),
-				// 	None => not = Some((i, true)),
-				// 	_ => return Err(format!("`{}`: NOT (`!`) is allowed only next to (excluding whitespaces) another NOT or a fact's name", input))
-				// },
-				// c if c.is_ascii_uppercase() => match not {
-				// 	Some((index, _)) if index + 1 != i => return Err(format!("`{}`: NOT (`!`) is allowed only next to (excluding whitespaces) another NOT or a fact's name", input)),
-				// 	_ if fact.is_some() => return Err(format!("`{}`: declare more than 1 fact here is forbidden", input)),
-				// 	_ => fact = Some(c)
-				// },
-				// _ => return Err(format!("`{}` in `{}`: illegal token", c, input))
-
-
-
-
-
-
-
-
             match c
             {
                 '(' => depth += 1,
@@ -168,7 +162,12 @@ impl Operation
 
 	pub fn resolve(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>) -> Option<bool>
 	{
-		self.operator.resolve(self.facts.0.resolve(rules, known, seen), self.facts.1.resolve(rules, known, seen))
+		let result = self.operator.resolve(self.facts.0.resolve(rules, known, seen), self.facts.1.resolve(rules, known, seen));
+		if self.is_not() && result.is_some()
+		{
+			return Some(!result.unwrap());
+		}
+		result
 	}
 
 	// TODO: Verify that we really don't use the three first (excluding `self`) param and if so remove them.
@@ -189,7 +188,9 @@ impl Operation
 		match self.operator
 		{
 			Operators::And => HashMap::from_iter(self.get_facts().iter().map(|&f| {
-				(f, Some(if f.is_not() { !result } else { result }))
+				// We use a XOR here because if the operation is NOT and a fact
+				// in it is also NOT then one cancel the other
+				(f, Some(if self.is_not() ^ f.is_not() { !result } else { result }))
 			})),
 			_ =>
 			{
