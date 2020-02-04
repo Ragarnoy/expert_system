@@ -27,54 +27,6 @@ use operation::Operation;
 use token::Factoken;
 use rules::Rule;
 
-
-// TODO Error enum for Expert system
-
-fn tokenize(facts: Vec<&str>)
-{
-    let mut oper: Vec<Operation> = Vec::new();
-
-    for f in facts.iter()
-    {
-        
-    }
-}
-
-
-// fn parse_and_return(input: String) -> Result<String, Error>
-// {
-//     let mut rule: Vec<&str> = Vec::new();
-
-//     'outer: for line in input.lines()
-//     {
-//         if !(line.find('#') == Some(0)) && line.find(char::is_alphabetic) == Some(0)
-//         {
-//             'inner: for str in line.split_whitespace()
-//             {
-//                 if str.chars().all(char::is_alphabetic) && str.len() == 1 ||
-//                 str.chars().nth(0) == Some('!') && str.chars().nth(1).unwrap().is_alphabetic() && str.len() == 2
-//                 {
-//                     rule.push(str);
-//                 }
-//                 if str == "+" || str == "|" || str == "^" || str == "=>" || str == "<=>"
-//                 {
-//                     rule.push(str);
-//                 }
-//                 if str == "#" { break 'inner; }
-//             }
-//             rule.push("\n")
-//         }
-//     }
-//     print!(" ");
-//     for a in rule.iter()
-//     {
-//         print!("{} ", a);
-//     }
-//     println!("");
-//     //tokenize(rule);
-//     return Ok("truc".into())
-// }
-
 fn get_facts_in_line(input: &str, output: &mut Vec<Fact>) -> Result<(), String>
 {
 	for c in input.chars()
@@ -115,11 +67,6 @@ fn parse(input: String) -> Result<(Vec<Rule>, Vec<Fact>, Vec<Fact>), String>
 		}
 		match &line[..1]
 		{
-			// NOTE: If we take a look at get_facts_in_line() definition we figure out
-			// that in the case of multiple queries/initial facts definition
-			// we will just add more queries/initial facts in the corresponding list,
-			// it's on purpose and it seems to be an acceptable behavior to me.
-			// However, it's maybe not what we want.
 			"=" => {
 				get_facts_in_line(&line[1..], &mut initials)?;
 				initials_mark = true;
