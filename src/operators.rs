@@ -58,20 +58,6 @@ impl Operators
 	}
 
     #[inline]
-	pub fn then() -> &'static str
-	{
-		static THEN: &str = "=>";
-		THEN
-	}
-
-    #[inline]
-	pub fn if_only() -> &'static str
-	{
-		static IF_ONLY: &str = "<=>";
-		IF_ONLY
-	}
-
-    #[inline]
     pub fn is_operator(c: char) -> bool
     {
         "+|^".contains(c)
@@ -96,8 +82,8 @@ impl Operators
     #[inline]
 	pub fn is_present(input: &str) -> bool
 	{
-		static operators: &[char] = &['+', '|', '^'];
-		input.contains(operators)
+		static OPERATORS: &[char] = &['+', '|', '^'];
+		input.contains(OPERATORS)
 	}
 }
 

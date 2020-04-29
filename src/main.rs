@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.rs                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlernoul <tlernoul@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vsporer <vsporer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/02 19:29:01 by tlernoul          #+#    #+#             */
-/*   Updated: 2019/10/15 18:39:39 by tlernoul         ###   ########.fr       */
+/*   Updated: 2020/04/29 15:55:58 by vsporer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,8 @@ mod token;
 mod rules;
 
 use clap::{Arg, App};
-use std::{path::Path, fs, io::Error, collections::HashMap, iter::FromIterator};
+use std::{path::Path, fs, collections::HashMap, iter::FromIterator};
 use fact::Fact;
-use operators::Operators; 
-use operation::Operation;
-use token::Factoken;
 use rules::Rule;
 
 fn get_facts_in_line(input: &str, output: &mut Vec<Fact>) -> Result<(), String>

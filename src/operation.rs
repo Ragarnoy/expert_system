@@ -171,7 +171,7 @@ impl Operation
 	}
 
 	// TODO: Verify that we really don't use the three first (excluding `self`) param and if so remove them.
-	pub fn resolve_as_conclusion(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>
+	pub fn resolve_as_conclusion(&self, result: bool) -> HashMap<Fact, Option<bool>>
 	{
 		// TODO: Handle OR and XOR conclusions
 		// Maybe a good idea to have a Vec<Fact> in the Operation struct

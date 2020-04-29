@@ -65,7 +65,7 @@ impl Factoken
 		}
 	}
 
-	pub fn resolve_as_conclusion(&self, rules: &Vec<Rule>, known: &mut HashMap<Fact, Option<bool>>, seen: &mut HashMap<Rule, Vec<Fact>>, result: bool) -> HashMap<Fact, Option<bool>>
+	pub fn resolve_as_conclusion(&self, result: bool) -> HashMap<Fact, Option<bool>>
 	{
 		match self
 		{
@@ -74,7 +74,7 @@ impl Factoken
 				ret.insert(*f, Some(if f.is_not() { !result } else { result }));
 				ret
 			},
-			Self::Operation(o) => o.resolve_as_conclusion(rules, known, seen, result)
+			Self::Operation(o) => o.resolve_as_conclusion(result)
 		}
 	}
 
